@@ -1,0 +1,51 @@
+start()[
+    name = "Alice"
+    age  = 20
+    n = 0
+
+    read("Write here: ":n)          // read syntax: "Text:" variable
+    write("Hello, " + name)
+    write("Your age is " + age)
+
+    if(age >= 18){
+        write(age);
+    }
+    elif(age <= 25){
+        write(age)
+    }
+    else{
+        write("You are a minor");
+    }
+
+    loop(i: +1: 0 to n){
+        write(i);
+    }
+
+    loop(i: -1: n-1 to -1){
+        write(i);
+    }
+
+    loop(i: 1){
+        write(i);
+    }check(0 to n)
+
+    // Function definition
+    add(a, b)[
+        return a + b
+    ]
+
+    loop(i: -1: n-1 to -1){
+        loop(i: -1: n-1 to -1){
+            write("inner");
+        }
+        write("outer");
+    }
+]
+
+
+/*
+    function scope: []
+    loop/if-else condition: ()
+    loop/if-else scope: {}
+*/
+
