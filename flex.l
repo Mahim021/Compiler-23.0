@@ -1,10 +1,10 @@
 %option noyywrap
+%option yylineno
 
 %{
 #include <stdio.h>
 #include <stdlib.h>
 
-int line_number = 1;  /* Track current line */
 FILE *output_file;    /* Output file pointer */
 %}
 
@@ -19,60 +19,62 @@ NUMBER      {DIGIT}+
 %%
 
     /* KEYWORDS - Must come before IDENTIFIER rule */
-"if"        { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, line_number); }
-"else"      { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, line_number); }
-"while"     { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, line_number); }
-"int"       { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, line_number); }
+"if"        { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
+"else"      { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
+"elif"      { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
+"loop"      { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
+"check"     { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
+"to"        { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
+"return"    { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
 
     /* OPERATORS - Multi-character operators MUST come before single-character */
-">="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, line_number); }
-"<="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, line_number); }
-"=="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, line_number); }
-"!="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, line_number); }
-"+"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, line_number); }
-"-"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, line_number); }
-"*"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, line_number); }
-"="         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, line_number); }
-">"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, line_number); }
-"<"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, line_number); }
+">="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
+"<="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
+"=="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
+"!="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
+"+"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
+"-"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
+"*"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
+"="         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
+">"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
+"<"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
 
     /* DELIMITERS */
-";"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, line_number); }
-","         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, line_number); }
-":"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, line_number); }
-"("         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, line_number); }
-")"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, line_number); }
-"{"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, line_number); }
-"}"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, line_number); }
-"["         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, line_number); }
-"]"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, line_number); }
+";"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
+","         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
+":"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
+"("         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
+")"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
+"{"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
+"}"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
+"["         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
+"]"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
 
-    /* STRING LITERALS */
-\"[^\"]*\"  { fprintf(output_file, "STRING: %s (Line %d)\n", yytext, line_number); }
+\"[^\"]*\"  { fprintf(output_file, "STRING: %s (Line %d)\n", yytext, yylineno); }
 
-    /* SINGLE LINE COMMENT - Ignore everything after // until newline */
+    /* SINGLE LINE COMMENT */
 "//".*      { /* Ignore comment content */ }
 
-    /* MULTI-LINE COMMENT - Enter comment state */
+    /* MULTI-LINE COMMENT */
 "/*"                    { BEGIN(COMMENT); }
 <COMMENT>"*/"           { BEGIN(INITIAL); }
-<COMMENT>\n             { line_number++; }
+<COMMENT>\n             { /* yylineno auto-increments */ }
 <COMMENT>.              { /* Ignore comment content */ }
 
-    /* NUMBERS - Using our definition */
-{NUMBER}    { fprintf(output_file, "NUMBER: %s (Line %d)\n", yytext, line_number); }
+    /* NUMBERS */
+{NUMBER}    { fprintf(output_file, "NUMBER: %s (Line %d)\n", yytext, yylineno); }
 
-    /* IDENTIFIERS - Using our definition */
-{IDENTIFIER} { fprintf(output_file, "IDENTIFIER: %s (Line %d)\n", yytext, line_number); }
+    /* IDENTIFIERS */
+{IDENTIFIER} { fprintf(output_file, "IDENTIFIER: %s (Line %d)\n", yytext, yylineno); }
 
-    /* WHITESPACE - Just ignore spaces and tabs */
+    /* WHITESPACE */
 [ \t]+      { /* Do nothing - skip whitespace */ }
 
-    /* NEWLINE - Count lines */
-\n          { line_number++; }
+    /* NEWLINE */
+\n          { /* yylineno handles this automatically */ }
 
-    /* ANYTHING ELSE - Report as error */
-.           { fprintf(output_file, "ERROR: Unknown character '%s' (Line %d)\n", yytext, line_number); }
+    /* ANYTHING ELSE */
+.           { fprintf(output_file, "ERROR: Unknown character '%s' (Line %d)\n", yytext, yylineno); }
 
 %%
 
@@ -99,7 +101,7 @@ int main() {
     fclose(output_file);
     
     printf("SUCCESS! Tokens have been written to output.txt\n");
-    printf("Processed %d lines from input.txt\n", line_number);
+    printf("Processed %d lines from input.txt\n", yylineno);
     
     return 0;
 }

@@ -3,7 +3,7 @@ start()[
     age  = 20
     n = 0
 
-    read("Write here: ":n)          // read syntax: "Text:" variable
+    read("Write here: ":n)          
     write("Hello, " + name)
     write("Your age is " + age)
 
