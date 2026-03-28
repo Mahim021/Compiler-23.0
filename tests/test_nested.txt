@@ -1,0 +1,20 @@
+start()[
+    // Nested loops to create a pattern
+    write("Nested Loop Pattern:")
+    
+    loop(i: +1: 1 to 4){
+        loop(j: +1: 1 to 4){
+            write(j)
+        }
+        write("---")
+    }
+    
+    // Matrix-like output
+    write("3x3 Grid:")
+    loop(row: +1: 0 to 3){
+        loop(col: +1: 0 to 3){
+            product = row * col
+            write(product)
+        }
+    }
+]

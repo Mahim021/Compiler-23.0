@@ -1,0 +1,30 @@
+start()[
+    // Function to add two numbers
+    add(a, b)[
+        return a + b
+    ]
+    
+    // Function to multiply two numbers
+    multiply(x, y)[
+        return x * y
+    ]
+    
+    // Function with no parameters
+    greet()[
+        write("Hello from function!")
+        return 42
+    ]
+    
+    // Test the functions
+    sum = add(10, 20)
+    write("10 + 20 = ")
+    write(sum)
+    
+    product = multiply(5, 6)
+    write("5 * 6 = ")
+    write(product)
+    
+    result = greet()
+    write("Function returned: ")
+    write(result)
+]

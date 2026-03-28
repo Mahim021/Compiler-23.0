@@ -4,8 +4,11 @@
 %{
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
+#include "parser.tab.h"
 
-FILE *output_file;    /* Output file pointer */
+/* For backward compatibility with original lexer */
+FILE *output_file = NULL;
 %}
 
 DIGIT       [0-9]
@@ -19,38 +22,42 @@ NUMBER      {DIGIT}+
 %%
 
     /* KEYWORDS - Must come before IDENTIFIER rule */
-"if"        { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
-"else"      { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
-"elif"      { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
-"loop"      { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
-"check"     { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
-"to"        { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
-"return"    { fprintf(output_file, "KEYWORD: %s (Line %d)\n", yytext, yylineno); }
+"if"        { return IF; }
+"else"      { return ELSE; }
+"elif"      { return ELIF; }
+"loop"      { return LOOP; }
+"check"     { return CHECK; }
+"to"        { return TO; }
+"return"    { return RETURN; }
 
     /* OPERATORS - Multi-character operators MUST come before single-character */
-">="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
-"<="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
-"=="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
-"!="        { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
-"+"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
-"-"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
-"*"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
-"="         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
-">"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
-"<"         { fprintf(output_file, "OPERATOR: %s (Line %d)\n", yytext, yylineno); }
+">="        { return GTE; }
+"<="        { return LTE; }
+"=="        { return EQ; }
+"!="        { return NEQ; }
+"+"         { return PLUS; }
+"-"         { return MINUS; }
+"*"         { return STAR; }
+"="         { return ASSIGN; }
+">"         { return GT; }
+"<"         { return LT; }
 
     /* DELIMITERS */
-";"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
-","         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
-":"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
-"("         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
-")"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
-"{"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
-"}"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
-"["         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
-"]"         { fprintf(output_file, "DELIMITER: %s (Line %d)\n", yytext, yylineno); }
+";"         { return SEMICOLON; }
+","         { return COMMA; }
+":"         { return COLON; }
+"("         { return LPAREN; }
+")"         { return RPAREN; }
+"{"         { return LBRACE; }
+"}"         { return RBRACE; }
+"["         { return LBRACKET; }
+"]"         { return RBRACKET; }
 
-\"[^\"]*\"  { fprintf(output_file, "STRING: %s (Line %d)\n", yytext, yylineno); }
+    /* STRING LITERALS */
+\"[^\"]*\"  { 
+    yylval.str_val = strndup(yytext + 1, strlen(yytext) - 2);  /* Remove quotes */
+    return STRING; 
+}
 
     /* SINGLE LINE COMMENT */
 "//".*      { /* Ignore comment content */ }
@@ -62,10 +69,16 @@ NUMBER      {DIGIT}+
 <COMMENT>.              { /* Ignore comment content */ }
 
     /* NUMBERS */
-{NUMBER}    { fprintf(output_file, "NUMBER: %s (Line %d)\n", yytext, yylineno); }
+{NUMBER}    { 
+    yylval.num_val = atof(yytext); 
+    return NUMBER; 
+}
 
     /* IDENTIFIERS */
-{IDENTIFIER} { fprintf(output_file, "IDENTIFIER: %s (Line %d)\n", yytext, yylineno); }
+{IDENTIFIER} { 
+    yylval.str_val = strdup(yytext); 
+    return IDENTIFIER; 
+}
 
     /* WHITESPACE */
 [ \t]+      { /* Do nothing - skip whitespace */ }
@@ -74,34 +87,9 @@ NUMBER      {DIGIT}+
 \n          { /* yylineno handles this automatically */ }
 
     /* ANYTHING ELSE */
-.           { fprintf(output_file, "ERROR: Unknown character '%s' (Line %d)\n", yytext, yylineno); }
+.           { 
+    fprintf(stderr, "Lexical Error at line %d: Unknown character '%s'\n", 
+            yylineno, yytext); 
+}
 
 %%
-
-int main() {
-    FILE *input_file = fopen("input.txt", "r");
-    if (!input_file) {
-        printf("ERROR: Cannot open input.txt\n");
-        printf("Make sure input.txt exists in the same folder.\n");
-        return 1;
-    }
-
-    output_file = fopen("output.txt", "w");
-    if (!output_file) {
-        printf("ERROR: Cannot create output.txt\n");
-        fclose(input_file);
-        return 1;
-    }
-
-    yyin = input_file;
-
-    yylex();
-
-    fclose(input_file);
-    fclose(output_file);
-    
-    printf("SUCCESS! Tokens have been written to output.txt\n");
-    printf("Processed %d lines from input.txt\n", yylineno);
-    
-    return 0;
-}

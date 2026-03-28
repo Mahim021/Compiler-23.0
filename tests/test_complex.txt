@@ -1,0 +1,32 @@
+start()[
+    // Complex expression
+    x = 5
+    y = 3
+    z = 2
+    
+    result = x + y * z
+    write("5 + 3 * 2 = ")
+    write(result)
+    
+    // Nested function calls
+    double(n)[
+        return n + n
+    ]
+    
+    triple(n)[
+        return n + n + n
+    ]
+    
+    val = double(5)
+    write("double(5) = ")
+    write(val)
+    
+    val2 = triple(double(3))
+    write("triple(double(3)) = ")
+    write(val2)
+    
+    // Negative numbers
+    neg = -10
+    write("Negative: ")
+    write(neg)
+]

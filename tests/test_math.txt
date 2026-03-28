@@ -1,0 +1,18 @@
+start()[
+    x = 10
+    y = 20
+    sum = x + y
+    product = x * y
+    diff = y - x
+    
+    write("x = ")
+    write(x)
+    write("y = ")
+    write(y)
+    write("sum = ")
+    write(sum)
+    write("product = ")
+    write(product)
+    write("difference = ")
+    write(diff)
+]

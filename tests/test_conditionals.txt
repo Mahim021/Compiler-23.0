@@ -1,0 +1,28 @@
+start()[
+    age = 25
+    
+    if(age >= 18){
+        write("You are an adult")
+    }
+    else{
+        write("You are a minor")
+    }
+    
+    score = 85
+    
+    if(score >= 90){
+        write("Grade: A")
+    }
+    elif(score >= 80){
+        write("Grade: B")
+    }
+    elif(score >= 70){
+        write("Grade: C")
+    }
+    elif(score >= 60){
+        write("Grade: D")
+    }
+    else{
+        write("Grade: F")
+    }
+]

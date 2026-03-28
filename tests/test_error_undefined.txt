@@ -1,0 +1,5 @@
+// ERROR TEST 1: Undefined variable
+start()[
+    write(undefined_variable)
+    x = 10
+]

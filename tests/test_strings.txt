@@ -1,0 +1,12 @@
+start()[
+    name = "Alice"
+    age = 25
+    city = "Wonderland"
+    
+    write("Name: " + name)
+    write("Age: " + age)
+    write("City: " + city)
+    
+    greeting = "Hello"
+    write(greeting + " " + name)
+]

@@ -1,0 +1,5 @@
+// ERROR TEST 3: Return outside function
+start()[
+    x = 10
+    return x  // Error: return not allowed in start()
+]

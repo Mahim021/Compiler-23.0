@@ -1,0 +1,373 @@
+================================================================================
+                    BUILD & TEST INSTRUCTIONS
+                     Your Custom Language Compiler
+================================================================================
+
+CURRENT STATUS:
+  ✓ Flex installed: D:\flex\bin\flex.exe version 2.5.4
+  ✓ GCC installed: gcc.exe (MinGW.org GCC-6.3.0-1) 6.3.0
+  ✗ Bison NOT installed (required for building)
+
+================================================================================
+                    STEP 1: INSTALL BISON (REQUIRED)
+================================================================================
+
+OPTION A: WinFlexBison (Recommended for Windows)
+------------------------------------------------
+1. Download from: https://github.com/lexxmark/winflexbison/releases
+2. Download: win_bison-latest.zip
+3. Extract to a folder (e.g., C:\winflexbison)
+4. Add to PATH:
+   - Open "Environment Variables" in Windows
+   - Add path to System PATH: C:\winflexbison
+
+OPTION B: GnuWin32 Bison
+------------------------------------------------
+1. Download from: http://gnuwin32.sourceforge.net/packages/bison.htm
+2. Install Bison for Windows
+3. Add bin folder to PATH
+
+OPTION C: Chocolatey (if you have it)
+------------------------------------------------
+choco install winflexbison3
+
+VERIFY INSTALLATION:
+After installing, run:
+  win_bison --version    OR    bison --version
+
+================================================================================
+                    STEP 2: BUILD THE COMPILER
+================================================================================
+
+METHOD 1: Using Makefile (if you have make/mingw32-make)
+---------------------------------------------------------
+make
+
+METHOD 2: Manual Build (Step-by-step commands)
+---------------------------------------------------------
+
+# Step 1: Generate parser files
+bison -d parser.y
+# OR on Windows:
+win_bison -d parser.y
+
+# Step 2: Generate lexer files
+flex flex.l
+
+# Step 3: Compile all C files
+gcc -Wall -Wno-unused-function -g -c lex.yy.c -o lex.yy.o
+gcc -Wall -Wno-unused-function -g -c parser.tab.c -o parser.tab.o
+gcc -Wall -Wno-unused-function -g -c ast.c -o ast.o
+gcc -Wall -Wno-unused-function -g -c symtable.c -o symtable.o
+gcc -Wall -Wno-unused-function -g -c semantic.c -o semantic.o
+gcc -Wall -Wno-unused-function -g -c interpreter.c -o interpreter.o
+gcc -Wall -Wno-unused-function -g -c codegen.c -o codegen.o
+gcc -Wall -Wno-unused-function -g -c main.c -o main.o
+
+# Step 4: Link everything
+gcc -Wall -Wno-unused-function -g -o compiler.exe lex.yy.o parser.tab.o ast.o symtable.o semantic.o interpreter.o codegen.o main.o -lm
+
+# You should now have compiler.exe!
+
+================================================================================
+                    STEP 3: TEST THE COMPILER
+================================================================================
+
+BASIC TEST (using your existing input.txt):
+--------------------------------------------
+.\compiler.exe input.txt
+
+EXPECTED OUTPUT:
+  === Parsing input.txt ===
+  Parsing successful!
+  
+  === Semantic Analysis ===
+  Semantic analysis passed!
+  
+  === Program Execution ===
+  [Your program output here]
+  
+  === Execution Complete ===
+
+WITH DEBUGGING OPTIONS:
+--------------------------------------------
+# See the Abstract Syntax Tree:
+.\compiler.exe input.txt --print-ast
+
+# See Three-Address Code (Intermediate Representation):
+.\compiler.exe input.txt --emit-ir
+
+# Both at once:
+.\compiler.exe input.txt --print-ast --emit-ir
+
+# Parse only, don't run:
+.\compiler.exe input.txt --no-run
+
+================================================================================
+                    STEP 4: MANUAL TESTING
+================================================================================
+
+TEST 1: Simple Hello World
+---------------------------
+Create file: test_hello.txt
+Content:
+  start()[
+      write("Hello, World!")
+  ]
+
+Run: .\compiler.exe test_hello.txt
+Expected: Hello, World!
+
+
+TEST 2: Variables and Math
+---------------------------
+Create file: test_math.txt
+Content:
+  start()[
+      x = 10
+      y = 20
+      sum = x + y
+      write(sum)
+  ]
+
+Run: .\compiler.exe test_math.txt
+Expected: 30
+
+
+TEST 3: Conditionals
+---------------------------
+Create file: test_if.txt
+Content:
+  start()[
+      age = 25
+      
+      if(age >= 18){
+          write("Adult")
+      }
+      else{
+          write("Minor")
+      }
+  ]
+
+Run: .\compiler.exe test_if.txt
+Expected: Adult
+
+
+TEST 4: Elif Chain
+---------------------------
+Create file: test_elif.txt
+Content:
+  start()[
+      score = 85
+      
+      if(score >= 90){
+          write("A")
+      }
+      elif(score >= 80){
+          write("B")
+      }
+      elif(score >= 70){
+          write("C")
+      }
+      else{
+          write("F")
+      }
+  ]
+
+Run: .\compiler.exe test_elif.txt
+Expected: B
+
+
+TEST 5: Loops
+---------------------------
+Create file: test_loop.txt
+Content:
+  start()[
+      n = 5
+      
+      loop(i: +1: 0 to n){
+          write(i)
+      }
+  ]
+
+Run: .\compiler.exe test_loop.txt
+Expected: 
+  0
+  1
+  2
+  3
+  4
+
+
+TEST 6: Functions
+---------------------------
+Create file: test_function.txt
+Content:
+  start()[
+      add(a, b)[
+          return a + b
+      ]
+      
+      result = add(10, 20)
+      write(result)
+  ]
+
+Run: .\compiler.exe test_function.txt
+Expected: 30
+
+
+TEST 7: String Concatenation
+---------------------------
+Create file: test_string.txt
+Content:
+  start()[
+      name = "Alice"
+      age = 25
+      
+      write("Name: " + name)
+      write("Age: ")
+      write(age)
+  ]
+
+Run: .\compiler.exe test_string.txt
+Expected:
+  Name: Alice
+  Age: 
+  25
+
+
+TEST 8: Nested Loops
+---------------------------
+Create file: test_nested.txt
+Content:
+  start()[
+      loop(i: +1: 0 to 3){
+          loop(j: +1: 0 to 3){
+              write(j)
+          }
+          write("---")
+      }
+  ]
+
+Run: .\compiler.exe test_nested.txt
+
+
+TEST 9: Error Testing - Undefined Variable
+---------------------------
+Create file: test_error1.txt
+Content:
+  start()[
+      write(undefined_var)
+  ]
+
+Run: .\compiler.exe test_error1.txt
+Expected: Semantic Error [line 2]: Undefined variable 'undefined_var'
+
+
+TEST 10: Error Testing - Wrong Arguments
+---------------------------
+Create file: test_error2.txt
+Content:
+  start()[
+      add(a, b)[
+          return a + b
+      ]
+      
+      result = add(10)  // Wrong number of arguments
+      write(result)
+  ]
+
+Run: .\compiler.exe test_error2.txt
+Expected: Semantic Error about argument count mismatch
+
+================================================================================
+                    STEP 5: DEBUGGING TIPS
+================================================================================
+
+SYNTAX ERRORS:
+--------------
+If you get "Syntax Error at line X", check:
+  - Missing parentheses, brackets, or braces
+  - Semicolons in wrong places (they're optional but can't be random)
+  - Keywords spelled correctly (if, elif, loop, etc.)
+  - start()[] must be the entry point
+
+SEMANTIC ERRORS:
+----------------
+If you get "Semantic Error", check:
+  - Variable used before assignment
+  - Function called with wrong number of arguments
+  - Return statement outside function
+
+RUNTIME ERRORS:
+---------------
+If you get "Runtime Error", check:
+  - Division by zero (if you add / operator later)
+  - Type mismatches (e.g., subtracting strings)
+  - Calling undefined functions
+
+VIEW AST TO DEBUG:
+------------------
+.\compiler.exe yourfile.txt --print-ast
+This shows the parse tree structure - useful for understanding how your code
+is being interpreted.
+
+VIEW IR TO DEBUG:
+-----------------
+.\compiler.exe yourfile.txt --emit-ir
+This shows three-address code - useful for compiler optimizations later.
+
+================================================================================
+                    TROUBLESHOOTING
+================================================================================
+
+ERROR: "Cannot open file"
+--------------------------
+Solution: Make sure the file exists in the current directory.
+Use full path: .\compiler.exe "D:\path\to\file.txt"
+
+ERROR: Compilation fails with undefined references
+---------------------------------------------------
+Solution: Make sure you compiled and linked all .c files (see Step 2)
+
+ERROR: Parser errors even with correct syntax
+----------------------------------------------
+Solution: 
+  1. Check that parser.y and flex.l match
+  2. Regenerate parser: bison -d parser.y
+  3. Regenerate lexer: flex flex.l
+  4. Recompile everything
+
+ERROR: Flex/Bison not found
+---------------------------
+Solution: Verify installation and PATH environment variable
+
+================================================================================
+                    QUICK REFERENCE
+================================================================================
+
+COMPILE:
+  bison -d parser.y
+  flex flex.l
+  gcc -o compiler.exe lex.yy.c parser.tab.c *.c -lm
+
+RUN:
+  .\compiler.exe <source_file> [options]
+
+OPTIONS:
+  --print-ast     Show abstract syntax tree
+  --emit-ir       Show intermediate code
+  --no-run        Don't execute, just parse
+
+LANGUAGE FEATURES:
+  Entry:          start()[]
+  Variables:      name = value
+  Output:         write(expr)
+  Input:          read("prompt":var)
+  If/Elif/Else:   if(cond){} elif(cond){} else{}
+  Loop:           loop(i: step: start to end){}
+  Functions:      name(params)[body]
+  Return:         return expr
+  Comments:       // or /* */
+
+================================================================================

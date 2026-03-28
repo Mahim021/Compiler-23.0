@@ -1,0 +1,9 @@
+// ERROR TEST 2: Wrong number of arguments
+start()[
+    add(a, b)[
+        return a + b
+    ]
+    
+    result = add(10)  // Should require 2 arguments
+    write(result)
+]

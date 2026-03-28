@@ -1,0 +1,4 @@
+start()[
+    write("Hello, World!")
+    write("Compiler is working!")
+]

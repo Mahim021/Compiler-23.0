@@ -1,0 +1,32 @@
+start()[
+    // Comparison operators
+    a = 10
+    b = 20
+    
+    if(a == b){
+        write("a equals b")
+    }
+    else{
+        write("a does not equal b")
+    }
+    
+    if(a != b){
+        write("a is different from b")
+    }
+    
+    if(a < b){
+        write("a is less than b")
+    }
+    
+    if(b > a){
+        write("b is greater than a")
+    }
+    
+    if(a <= 10){
+        write("a is less than or equal to 10")
+    }
+    
+    if(b >= 20){
+        write("b is greater than or equal to 20")
+    }
+]
